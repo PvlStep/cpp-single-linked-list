@@ -64,7 +64,7 @@ class SingleLinkedList {
         }
 
         [[nodiscard]] bool operator!=(const BasicIterator<const Type>& rhs) const noexcept {
-            return node_ != rhs.node_;
+            return !(node_ == rhs.node_);
         }
 
         [[nodiscard]] bool operator==(const BasicIterator<Type>& rhs) const noexcept {
@@ -72,7 +72,7 @@ class SingleLinkedList {
         }
 
         [[nodiscard]] bool operator!=(const BasicIterator<Type>& rhs) const noexcept {
-            return node_ != rhs.node_;
+            return !(node_ == rhs.node_);
         }
 
         BasicIterator& operator++() noexcept {
@@ -198,6 +198,7 @@ public:
     }
 
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
+        assert(pos.node_ != nullptr);
         if (pos != this->before_begin()) {
             Node* new_node = new Node(value, pos.node_->next_node);
             pos.node_->next_node = new_node;
@@ -220,6 +221,7 @@ public:
     }
 
     Iterator EraseAfter(ConstIterator pos) noexcept {
+        assert(pos.node_ && pos.node_->next_node && size_ > 0);
         Node* before = pos.node_;
         auto after_item = before->next_node->next_node;
         delete before->next_node;
@@ -240,6 +242,23 @@ public:
 
     template <typename ForwList>
     void CopyAndReverse(ForwList& other) {
+    /* Комментарий ревьюера: "Внутри класса вам доступно использование приватных методов, в частности здесь можно значительно упростить алгоритм. 
+        Прямо внутри этого метода создавайте новые элементы и цепляйте их друг за дружку начиная с head. Это позволит избавиться от лишнего цикла"
+        
+       - Попытался реализовать такой способ, но он не работает. Буду пытаться разобраться с этой темой подробнее.
+       Node* last = nullptr;
+        for (auto elem : other) {
+            Node* item = new Node(elem);
+            if (head_.next_node == nullptr) {
+                head_ = *item;
+            }
+            else {
+                last->next_node = item;
+            }
+            last = item;
+            ++size_;
+      }*/
+      
         SingleLinkedList temp, temp2;
         for (auto elem : other) {
             temp.PushFront(elem);
